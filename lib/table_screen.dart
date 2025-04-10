@@ -22,18 +22,18 @@ class _TableScreenState extends State<TableScreen> {
         child: SingleChildScrollView(
           child: DataTable(
             columns: const [
-              DataColumn(label: Text("Id")),
-              DataColumn(label: Text("Name")),
-              DataColumn(label: Text("Email")),
-              DataColumn(label: Text("Address")),
-              DataColumn(label: Text("Birthday")),
+              DataColumn(label: Text("jour")),
+              DataColumn(label: Text("date")),
+              DataColumn(label: Text("heure")),
+              DataColumn(label: Text("montant verse")),
+              DataColumn(label: Text("solde")),
             ],
             rows: customersList.map((customer) => DataRow(cells: [
-              DataCell(Text(customer.id)),
-              DataCell(Text(customer.name)),
-              DataCell(Text(customer.email)),
-              DataCell(Text(customer.address)),
-              DataCell(Text(customer.birthday)),
+              DataCell(Center(child: Text(customer.jour))),
+              DataCell(Center(child: Text(customer.date))),
+              DataCell(Center(child: Text(customer.heure))),
+              DataCell(Center(child: Text(customer.montant_verse))),
+              DataCell(Center(child: Text(customer.solde))),
             ])).toList(),
           ),
         ),

@@ -48,11 +48,11 @@ class PdfService {
             headers: ['JOURS', 'DATES', 'HEURES', 'MONTANT VERSE', 'SOLDE'],
             data: data
                 .map((customer) => [
-                      customer.id ?? '',
-                      customer.name ?? '',
-                      customer.email ?? '',
-                      customer.address ?? '',
-                      customer.birthday ?? '',
+                      customer.jour ?? '',
+                      customer.date ?? '',
+                      customer.heure ?? '',
+                      customer.montant_verse ?? '',
+                      customer.solde ?? '',
                     ])
                 .toList(),
             headerStyle: pw.TextStyle(

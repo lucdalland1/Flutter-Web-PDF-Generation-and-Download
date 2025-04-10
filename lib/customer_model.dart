@@ -1,25 +1,25 @@
 class CustomerModel {
-  String id;
-  String name;
-  String email;
-  String address;
-  String birthday;
+  String jour;
+  String date;
+  String heure;
+  String montant_verse;
+  String solde;
 
   CustomerModel({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.address,
-    required this.birthday,
+    required this.jour,
+    required this.date,
+    required this.heure,
+    required this.montant_verse,
+    required this.solde,
   });
 }
 
-final List<CustomerModel> customersList = List.generate(100, (index) {
+final List<CustomerModel> customersList = List.generate(5, (index) {
   return CustomerModel(
-    id: (1000000000 + index).toString(),
-    name: "${index+1}${index==0?"er":""}",
-    address: "Address $index, City $index, State $index",
-    email: "customer$index@example.com",
-    birthday: "January ${index % 31 + 1}, ${1980 + (index % 40)}",
+    jour: (1000000000 + index).toString(),
+    date: "${index+1}${index==0?"er":""}",
+    heure: "Address $index, City $index, State $index",
+    montant_verse: "customer$index@example.com",
+    solde: "January ${index % 31 + 1}, ${1980 + (index % 40)}",
   );
 });
