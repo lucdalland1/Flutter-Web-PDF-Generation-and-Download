@@ -1,64 +1,91 @@
 import 'dart:convert';
-import 'dart:html';
-import 'dart:ui';
-
+import 'dart:html' as html; // Pour Flutter Web
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'customer_model.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PdfService {
   Future<void> printCustomersPdf(List<CustomerModel> data) async {
-    //Create a new PDF document
-    PdfDocument document = PdfDocument();
-    PdfGrid grid = PdfGrid();
+    final pdf = pw.Document();
 
-    //Define number of columns in table
-    grid.columns.add(count: 5);
-    //Add header to the grid
-    grid.headers.add(1);
-    //Add the rows to the grid
-    PdfGridRow header = grid.headers[0];
-    header.cells[0].value = "Id";
-    header.cells[1].value = "Name";
-    header.cells[2].value = "Email";
-    header.cells[3].value = "Address";
-    header.cells[4].value = "Birthday";
-    //Add header style
-    header.style = PdfGridCellStyle(
-      backgroundBrush: PdfBrushes.lightGray,
-      textBrush: PdfBrushes.black,
-      font: PdfStandardFont(PdfFontFamily.timesRoman, 12),
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(20),
+        build: (context) => [
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Archidiocèse de Brazzaville\nParoisse Sainte Rite\nMoukondo\nBP:14 511 Brazzaville',
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                    pw.Text(
+                      'SUIVI DE LA QUÊTE \n ', /////*${DateTime.now().toLocal()}*/',
+                      style: pw.TextStyle(fontSize: 12),
+                    ),
+                    pw.Text(
+                        'Mois de :  Avril  ${DateTime.now().year}',
+                      style: pw.TextStyle(fontSize: 12),
+                    ),
+                  ])
+                ],
+              ),
+              pw.SizedBox(height: 10),
+              pw.Divider(),
+            ],
+          ),
+          pw.Table.fromTextArray(
+            headers: ['JOURS', 'DATES', 'HEURES', 'MONTANT VERSE', 'SOLDE'],
+            data: data
+                .map((customer) => [
+                      customer.id ?? '',
+                      customer.name ?? '',
+                      customer.email ?? '',
+                      customer.address ?? '',
+                      customer.birthday ?? '',
+                    ])
+                .toList(),
+            headerStyle: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 12,
+            ),
+            cellStyle: const pw.TextStyle(fontSize: 10),
+            cellAlignment: pw.Alignment.centerLeft,
+            headerDecoration: const pw.BoxDecoration(
+              color: PdfColors.grey300,
+            ),
+            cellPadding: const pw.EdgeInsets.all(5),
+          ),
+        ],
+        footer: (context) => pw.Container(
+          alignment: pw.Alignment.center,
+          margin: const pw.EdgeInsets.only(top: 10),
+          child: pw.Text(
+            'Page ${context.pageNumber} / ${context.pagesCount}',
+            style: const pw.TextStyle(fontSize: 10),
+          ),
+        ),
+      ),
     );
 
-    //Add rows to grid
-    for (final customer in data) {
-      PdfGridRow row = grid.rows.add();
-      row.cells[0].value = customer.id;
-      row.cells[1].value = customer.name;
-      row.cells[2].value = customer.email;
-      row.cells[3].value = customer.address;
-      row.cells[4].value = customer.birthday;
-    }
-    //Add rows style
-    grid.style = PdfGridStyle(
-      cellPadding: PdfPaddings(left: 10, right: 3, top: 4, bottom: 5),
-      backgroundBrush: PdfBrushes.white,
-      textBrush: PdfBrushes.black,
-      font: PdfStandardFont(PdfFontFamily.timesRoman, 12),
-    );
-
-    //Draw the grid
-    grid.draw(
-        page: document.pages.add(), bounds: const Rect.fromLTWH(0, 0, 0, 0));
-    List<int> bytes = await document.save();
-
-    //Download document
-    AnchorElement(
-        href:
-            "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(bytes)}")
+    // Sauvegarder le PDF en base64 pour téléchargement web
+    final bytes = await pdf.save();
+    final base64Str = base64Encode(bytes);
+    final blob = html.Blob([bytes], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
       ..setAttribute("download", "report.pdf")
       ..click();
-
-    //Dispose the document
-    document.dispose();
+    html.Url.revokeObjectUrl(url);
   }
 }
